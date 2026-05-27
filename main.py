@@ -51,7 +51,7 @@ STYLE_CONFIG = {
         "space_before_pt": 0,
         "space_after_pt": 6,
         "align": WD_ALIGN_PARAGRAPH.JUSTIFY,
-        "first_line_indent_cm": 1.25,
+        "first_line_indent_cm": 1.27,
     },
     "heading1": {
         # Chương X + tên chương (2 dòng liên tiếp)
@@ -63,6 +63,7 @@ STYLE_CONFIG = {
         "space_before_pt": 0,
         "space_after_pt": 0,
         "line_spacing": 1.5,
+        "first_line_indent_cm": None,
     },
     "heading2": {
         # 1.1. TÊN MỤC
@@ -74,6 +75,7 @@ STYLE_CONFIG = {
         "space_before_pt": 0,
         "space_after_pt": 0,
         "line_spacing": 1.5,
+        "first_line_indent_cm": None,
     },
     "heading3": {
         # 1.1.1. Tên tiểu mục
@@ -95,6 +97,7 @@ STYLE_CONFIG = {
         "space_before_pt": 0,
         "space_after_pt": 0,
         "line_spacing": 1.5,
+        "first_line_indent_cm": None,
     },
     "heading5": {
         "font": "Times New Roman",
@@ -105,6 +108,7 @@ STYLE_CONFIG = {
         "space_before_pt": 0,
         "space_after_pt": 0,
         "line_spacing": 1.5,
+        "first_line_indent_cm": None,
     },
     "caption_figure": {
         # Hình X.Y. Tên hình — dưới hình, căn giữa
@@ -281,6 +285,14 @@ def reformat_caption_text(text: str, tracker: CaptionTracker, is_figure: bool) -
 
 def format_document(doc: Document) -> Document:
     cfg = STYLE_CONFIG
+    
+    # Tìm index của Heading 1 đầu tiên
+    first_heading_idx = None
+    for i, p in enumerate(doc.paragraphs):
+        if p.style.name == 'Heading 1' and p.text.strip():
+            first_heading_idx = i
+            break
+
     tracker = CaptionTracker()
 
     # 1. Page layout
@@ -296,6 +308,25 @@ def format_document(doc: Document) -> Document:
     for para in doc.paragraphs:
         style_name = para.style.name
         text = para.text.strip()
+
+        # ---- Trang bìa: trước Heading 1 đầu tiên ----
+        if first_heading_idx and i < first_heading_idx:
+            pf = para.paragraph_format
+            pf.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            pf.first_line_indent = None
+            pf.line_spacing_rule = WD_LINE_SPACING.MULTIPLE
+            pf.line_spacing = 1.5
+            for run in para.runs:
+                run.font.name = 'Times New Roman'
+                run.font.size = Pt(14)
+                rpr = run._r.get_or_add_rPr()
+                rFonts = rpr.find(qn('w:rFonts'))
+                if rFonts is None:
+                    rFonts = OxmlElement('w:rFonts')
+                    rpr.insert(0, rFonts)
+                for attr in ('w:ascii', 'w:hAnsi', 'w:cs', 'w:eastAsia'):
+                    rFonts.set(qn(attr), 'Times New Roman')
+            continue  # ← skip các xử lý bên dưới
 
         # Detect chapter để cập nhật tracker
         ch = detect_chapter_from_text(text)
