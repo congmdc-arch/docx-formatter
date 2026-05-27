@@ -307,7 +307,7 @@ def format_document(doc: Document) -> Document:
         section.right_margin = Cm(cfg["page"]["margin_right_cm"])
 
     # 2. Format paragraphs
-    for para in enumerate(doc.paragraphs):
+    for i, para in enumerate(doc.paragraphs):
         style_name = para.style.name
         text = para.text.strip()
 
