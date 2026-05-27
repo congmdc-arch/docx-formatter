@@ -49,7 +49,7 @@ STYLE_CONFIG = {
         "size_pt": 14,
         "line_spacing": 1.5,
         "space_before_pt": 0,
-        "space_after_pt": 6,
+        "space_after_pt": 0,
         "align": WD_ALIGN_PARAGRAPH.JUSTIFY,
         "first_line_indent_cm": 1.27,
     },
