@@ -142,6 +142,8 @@ STYLE_CONFIG = {
     "list": {
         "font": "Times New Roman",
         "size_pt": 14,
+        "space_before_pt": 0,
+        "space_after_pt": 0,
         "line_spacing": 1.5,
     },
 }
@@ -323,7 +325,7 @@ def ensure_caption_styles(doc: Document):
 def format_document(doc: Document) -> Document:
     cfg = STYLE_CONFIG
     ensure_caption_styles(doc)
-    
+
     # Tìm index của Heading 1 đầu tiên
     first_heading_idx = None
     for i, p in enumerate(doc.paragraphs):
@@ -409,12 +411,15 @@ def format_document(doc: Document) -> Document:
             if is_fig:
                 new_text = reformat_caption_text(text, tracker, is_figure=True)
                 h_cfg = cfg['caption_figure']
+                para.style = doc.styles['Caption_Figure']
             elif is_tbl:
                 new_text = reformat_caption_text(text, tracker, is_figure=False)
                 h_cfg = cfg['caption_table']
+                para.style = doc.styles['Caption_Table']
             else:
                 new_text = text
-                h_cfg = cfg['caption_figure']  # default
+                h_cfg = cfg['caption_figure']
+                para.style = doc.styles['Caption_Figure']
 
             # Rewrite text vào run đầu, xóa runs thừa
             if para.runs:
