@@ -113,24 +113,26 @@ STYLE_CONFIG = {
     "caption_figure": {
         # Hình X.Y. Tên hình — dưới hình, căn giữa
         "font": "Times New Roman",
-        "size_pt": 13,
-        "bold": False,
-        "italic": True,
-        "align": WD_ALIGN_PARAGRAPH.CENTER,
-        "space_before_pt": 0,
-        "space_after_pt": 0,
-        "line_spacing": 1.5,
-    },
-    "caption_table": {
-        # Bảng X.Y. Tên bảng — trên bảng, căn giữa
-        "font": "Times New Roman",
-        "size_pt": 13,
+        "size_pt": 14,
         "bold": True,
         "italic": False,
         "align": WD_ALIGN_PARAGRAPH.CENTER,
         "space_before_pt": 0,
         "space_after_pt": 0,
         "line_spacing": 1.5,
+        "first_line_indent_cm": None,
+    },
+    "caption_table": {
+        # Bảng X.Y. Tên bảng — trên bảng, căn giữa
+        "font": "Times New Roman",
+        "size_pt": 14,
+        "bold": True,
+        "italic": False,
+        "align": WD_ALIGN_PARAGRAPH.CENTER,
+        "space_before_pt": 0,
+        "space_after_pt": 0,
+        "line_spacing": 1.5,
+        "first_line_indent_cm": None,
     },
     "table_content": {
         "font": "Times New Roman",
@@ -305,7 +307,7 @@ def format_document(doc: Document) -> Document:
         section.right_margin = Cm(cfg["page"]["margin_right_cm"])
 
     # 2. Format paragraphs
-    for para in doc.paragraphs:
+    for para in enumerate(doc.paragraphs):
         style_name = para.style.name
         text = para.text.strip()
 
