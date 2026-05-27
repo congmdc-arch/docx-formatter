@@ -87,6 +87,7 @@ STYLE_CONFIG = {
         "space_before_pt": 0,
         "space_after_pt": 0,
         "line_spacing": 1.5,
+        "first_line_indent_cm": None,
     },
     "heading4": {
         "font": "Times New Roman",
@@ -284,9 +285,44 @@ def reformat_caption_text(text: str, tracker: CaptionTracker, is_figure: bool) -
 # ============================================================
 # MAIN FORMAT FUNCTION
 # ============================================================
+def ensure_caption_styles(doc: Document):
+    """Tạo style Caption_Figure và Caption_Table trong document nếu chưa có"""
+    
+    styles = doc.styles
+    
+    # ---- Caption_Figure ----
+    if 'Caption_Figure' not in [s.name for s in styles]:
+        style_fig = styles.add_style('Caption_Figure', 1)  # 1 = paragraph style
+        style_fig.base_style = styles['Caption'] if 'Caption' in [s.name for s in styles] else styles['Normal']
+        style_fig.font.name = 'Times New Roman'
+        style_fig.font.size = Pt(13)
+        style_fig.font.bold = False
+        style_fig.font.italic = True
+        style_fig.paragraph_format.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        style_fig.paragraph_format.space_before = Pt(3)
+        style_fig.paragraph_format.space_after = Pt(10)
+        style_fig.paragraph_format.line_spacing_rule = WD_LINE_SPACING.MULTIPLE
+        style_fig.paragraph_format.line_spacing = 1.5
+        style_fig.paragraph_format.first_line_indent = None
+
+    # ---- Caption_Table ----
+    if 'Caption_Table' not in [s.name for s in styles]:
+        style_tbl = styles.add_style('Caption_Table', 1)
+        style_tbl.base_style = styles['Caption'] if 'Caption' in [s.name for s in styles] else styles['Normal']
+        style_tbl.font.name = 'Times New Roman'
+        style_tbl.font.size = Pt(13)
+        style_tbl.font.bold = True
+        style_tbl.font.italic = False
+        style_tbl.paragraph_format.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        style_tbl.paragraph_format.space_before = Pt(10)
+        style_tbl.paragraph_format.space_after = Pt(3)
+        style_tbl.paragraph_format.line_spacing_rule = WD_LINE_SPACING.MULTIPLE
+        style_tbl.paragraph_format.line_spacing = 1.5
+        style_tbl.paragraph_format.first_line_indent = None
 
 def format_document(doc: Document) -> Document:
     cfg = STYLE_CONFIG
+    ensure_caption_styles(doc)
     
     # Tìm index của Heading 1 đầu tiên
     first_heading_idx = None
